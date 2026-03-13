@@ -1,7 +1,7 @@
 ---
 title: "市场分析报告 - 2026-03-14"
 date: 2026-03-14
-time: 00:32
+time: 00:43
 tags:
   - finance
   - market
@@ -12,7 +12,7 @@ source: fin-advisor
 
 # 📈 市场分析报告 - 2026-03-14
 
-> 生成时间: 00:32
+> 生成时间: 00:43
 > 报告类型: 日常市场分析
 > 数据来源: **Fin-Advisor Agent** ✅
 
@@ -219,7 +219,7 @@ source: fin-advisor
 %%
 - 数据来源: Fin-Advisor Agent
 - 策略配置: macd_strategy,rsi_strategy,sma_strategy,
-- 更新时间: 00:32
+- 更新时间: 00:43
 - 下次更新: 2026-03-15 09:00
 %%
 
