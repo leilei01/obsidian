@@ -1,58 +1,3 @@
-# OpenClaw Agent / Skill 平迁教程
-
-本文给出一套针对 `OpenClaw` 的定向迁移方案：把 Ubuntu 上指定的 `agent` 或 `skill` 完整导出，再在另一台机器例如 macOS / MacBook 上导入，并执行校验。
-
-方案遵循 OpenClaw 官方 CLI 约定：
-
-- `openclaw agents` 用于管理隔离 agent，包括 `add`、`bind`、`set-identity`、`list`
-- `openclaw skills` 用于发现和检查技能
-- `openclaw config get/set` 用于非交互配置读写
-- `openclaw backup verify` 体现了官方“归档 + manifest 校验”的思路，本方案沿用同类校验模型做定向迁移
-
-官方文档入口：
-
-- CLI 总览: https://docs.openclaw.ai/cli
-- Agents: https://docs.openclaw.ai/cli/agents
-- Skills: https://docs.openclaw.ai/cli/skills
-- Config: https://docs.openclaw.ai/cli/config
-- Backup: https://docs.openclaw.ai/cli/backup
-
-## 1. 迁移边界
-
-### Skill 迁移会带走
-
-- skill 目录本体
-- `skills.entries.<skillKey>` 下的配置覆盖
-- 归档内的文件级 SHA-256 校验清单
-
-### Agent 迁移会带走
-
-- `~/.openclaw/agents/<agentId>` 整个 agent 状态目录
-- 该 agent 对应 workspace
-- `memory/<agentId>.sqlite`，如果存在
-- `agents.list` 中该 agent 的完整配置项
-- `openclaw agents bindings` 返回的路由绑定
-- 归档内的文件级 SHA-256 校验清单
-
-导入时脚本会把 `agentDir` 和 `workspace` 从源机器的绝对路径重写到目标机器当前的 OpenClaw state 目录下，例如重写到目标机的 `~/.openclaw/agents/<agentId>/...`。这一步是“平迁”成立的关键。
-
-### 不建议混进这次“定向平迁”的内容
-
-- 全局 channels 登录态
-- 全局 credentials
-- 和目标 agent 无关的其它插件、cron、设备配对信息
-
-这些内容属于整机迁移，更适合配合官方 `openclaw backup create/verify` 做全量备份。
-
-## 2. 脚本
-
-权威版本以 [openclaw_migrate.sh](/data/Documents/Obsidian/Work/2thBrain/scripts/openclaw_migrate.sh) 为准。下面代码块用于文档内联展示；如果你后续又调整了脚本，请以文件里的最新版本为准。
-
-当前脚本已落在 Work vault 的 `2thBrain/scripts/` 下。下文所有相对路径命令默认都在 `/data/Documents/Obsidian/Work/2thBrain` 目录执行。
-
-把脚本保存为 [openclaw_migrate.sh](/data/Documents/Obsidian/Work/2thBrain/scripts/openclaw_migrate.sh) 并赋执行权限：
-
-```bash
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -67,19 +12,21 @@ TARGET=""
 MODE=""
 ITEM_TYPE=""
 INSTALL_MODE="auto"
+REMAPS=()
 
 usage() {
   cat <<'EOF'
 Usage:
   openclaw_migrate.sh export skill <skill-name> [--output-dir DIR] [--profile NAME]
   openclaw_migrate.sh export agent <agent-id> [--output-dir DIR] [--profile NAME]
-  openclaw_migrate.sh import <archive.tgz> [--profile NAME] [--state-dir DIR] [--force] [--install-mode auto|managed|workspace]
+  openclaw_migrate.sh import <archive.tgz> [--profile NAME] [--state-dir DIR] [--force] [--install-mode auto|managed|workspace] [--remap FROM=TO]
   openclaw_migrate.sh verify-archive <archive.tgz>
 
 Notes:
   - Default state dir: ~/.openclaw
   - Profile state dir: ~/.openclaw-<profile>
   - `import` auto-detects whether the archive contains a skill or an agent.
+  - `--remap FROM=TO` can be repeated to rewrite absolute paths inside imported text files.
 EOF
 }
 
@@ -122,8 +69,47 @@ openclaw_cmd() {
   fi
 }
 
+capture_openclaw_json() {
+  local output_file="$1"
+  shift
+  local raw_file
+  raw_file="$(mktemp)"
+  openclaw_cmd "$@" >"$raw_file"
+  python3 - "$raw_file" "$output_file" <<'PY'
+import json
+import pathlib
+import sys
+
+raw_path = pathlib.Path(sys.argv[1])
+out_path = pathlib.Path(sys.argv[2])
+text = raw_path.read_text(encoding="utf-8")
+decoder = json.JSONDecoder()
+best = None
+
+for idx, ch in enumerate(text):
+    if ch not in "{[":
+        continue
+    try:
+        value, end = decoder.raw_decode(text[idx:])
+    except json.JSONDecodeError:
+        continue
+    best = json.dumps(value, ensure_ascii=False, indent=2)
+    break
+
+if best is None:
+    raise SystemExit("no JSON payload found in openclaw output")
+
+out_path.write_text(best + "\n", encoding="utf-8")
+PY
+  rm -f "$raw_file"
+}
+
 config_file_path() {
   local out
+  if [[ -n "$STATE_DIR" ]]; then
+    printf '%s/openclaw.json\n' "$STATE_DIR"
+    return
+  fi
   out="$(openclaw_cmd config file 2>/dev/null | tail -n 1 || true)"
   if [[ -n "$out" && "$out" = /* ]]; then
     printf '%s\n' "$out"
@@ -144,8 +130,14 @@ ensure_config_file() {
 copy_path() {
   local src="$1"
   local dst="$2"
+  local tmp_root staged_src
   mkdir -p "$(dirname "$dst")"
-  tar -C "$(dirname "$src")" -cf - "$(basename "$src")" | tar -C "$(dirname "$dst")" -xf -
+  tmp_root="$(mktemp -d)"
+  tar -C "$(dirname "$src")" -cf - "$(basename "$src")" | tar -C "$tmp_root" -xf -
+  staged_src="$tmp_root/$(basename "$src")"
+  rm -rf "$dst"
+  mv "$staged_src" "$dst"
+  rmdir "$tmp_root" 2>/dev/null || true
 }
 
 remove_if_force() {
@@ -288,7 +280,7 @@ export_skill() {
   [[ -f "$config_path" ]] || err "OpenClaw config not found: $config_path"
 
   skill_info_json="$(mktemp)"
-  openclaw_cmd skills info "$skill_name" --json >"$skill_info_json"
+  capture_openclaw_json "$skill_info_json" skills info "$skill_name" --json
   skill_dir="$(json_get "$skill_info_json" "baseDir")"
   skill_key="$(json_get "$skill_info_json" "skillKey")"
   source="$(json_get "$skill_info_json" "source")"
@@ -337,7 +329,7 @@ export_agent() {
   fi
 
   bindings_json="$tmp_dir/meta/bindings.json"
-  openclaw_cmd agents bindings --agent "$agent_id" --json >"$bindings_json"
+  capture_openclaw_json "$bindings_json" agents bindings --agent "$agent_id" --json
 
   agent_root="$state_dir/agents/$agent_id"
   [[ -d "$agent_root" ]] || err "Agent state directory not found: $agent_root"
@@ -359,6 +351,7 @@ export_agent() {
   "archiveType": "openclaw-migration",
   "itemType": "agent",
   "name": $(json_escape "$agent_id"),
+  "sourceStateDir": $(json_escape "$state_dir"),
   "exportedAt": $(json_escape "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"),
   "openclawVersion": $(json_escape "$($OPENCLAW_BIN --version | tail -n 1)")
 }
@@ -391,7 +384,7 @@ merge_agent_entry() {
   local merged_file="$2"
   local current_json
   current_json="$(mktemp)"
-  if ! openclaw_cmd config get agents.list --json >"$current_json" 2>/dev/null; then
+  if ! capture_openclaw_json "$current_json" config get agents.list --json 2>/dev/null; then
     printf '[]\n' >"$current_json"
   fi
   python3 - "$current_json" "$imported_entry_file" "$merged_file" <<'PY'
@@ -422,10 +415,169 @@ PY
   rm -f "$current_json"
 }
 
+rewrite_agent_entry_paths() {
+  local metadata_file="$1"
+  local entry_file="$2"
+  local target_state_dir="$3"
+  local output_file="$4"
+  python3 - "$metadata_file" "$entry_file" "$target_state_dir" "$output_file" <<'PY'
+import json
+import os
+import sys
+
+metadata_file, entry_file, target_state_dir, output_file = sys.argv[1:]
+metadata = json.load(open(metadata_file, encoding='utf-8'))
+entry = json.load(open(entry_file, encoding='utf-8'))
+
+agent_id = metadata["name"]
+source_state_dir = (metadata.get("sourceStateDir") or "").rstrip(os.sep)
+default_agent_root = os.path.join(target_state_dir, "agents", agent_id)
+default_workspace = os.path.join(default_agent_root, "workspace")
+
+entry["agentDir"] = os.path.join(default_agent_root, "agent")
+
+workspace = entry.get("workspace")
+if isinstance(workspace, str) and workspace:
+    if source_state_dir and workspace == os.path.join(source_state_dir, "workspace"):
+        entry["workspace"] = os.path.join(target_state_dir, "workspace")
+    elif source_state_dir and workspace.startswith(source_state_dir + os.sep):
+        suffix = workspace[len(source_state_dir) + 1 :]
+        entry["workspace"] = os.path.join(target_state_dir, suffix)
+    elif os.path.basename(workspace) == "workspace":
+        entry["workspace"] = default_workspace
+else:
+    entry["workspace"] = default_workspace
+
+with open(output_file, "w", encoding="utf-8") as fh:
+    json.dump(entry, fh, ensure_ascii=False, indent=2)
+PY
+}
+
+build_remap_file() {
+  local output_file="$1"
+  local source_state_dir="$2"
+  local target_state_dir="$3"
+  local source_agent_root="$4"
+  local target_agent_root="$5"
+  local source_workspace="$6"
+  local target_workspace="$7"
+  shift 7
+  python3 - "$output_file" "$source_state_dir" "$target_state_dir" "$source_agent_root" "$target_agent_root" "$source_workspace" "$target_workspace" "$@" <<'PY'
+import json
+import os
+import sys
+
+output_file, source_state_dir, target_state_dir, source_agent_root, target_agent_root, source_workspace, target_workspace, *extra = sys.argv[1:]
+pairs = []
+seen = set()
+
+def add_pair(src: str, dst: str) -> None:
+    src = (src or "").rstrip(os.sep)
+    dst = (dst or "").rstrip(os.sep)
+    if not src or not dst or src == dst or src in seen:
+        return
+    seen.add(src)
+    pairs.append({"from": src, "to": dst})
+
+def home_dir(path: str) -> str:
+    path = (path or "").rstrip(os.sep)
+    if not path:
+        return ""
+    return os.path.dirname(path)
+
+add_pair(source_workspace, target_workspace)
+add_pair(source_agent_root, target_agent_root)
+add_pair(source_state_dir, target_state_dir)
+add_pair(home_dir(source_state_dir), home_dir(target_state_dir))
+
+for item in extra:
+    if not item:
+        continue
+    if "=" not in item:
+        raise SystemExit(f"invalid remap, expected FROM=TO: {item}")
+    src, dst = item.split("=", 1)
+    add_pair(src, dst)
+
+pairs.sort(key=lambda item: len(item["from"]), reverse=True)
+
+with open(output_file, "w", encoding="utf-8") as fh:
+    json.dump(pairs, fh, ensure_ascii=False, indent=2)
+PY
+}
+
+rewrite_text_paths_in_tree() {
+  local base_dir="$1"
+  local remap_file="$2"
+  [[ -d "$base_dir" ]] || return 0
+  python3 - "$base_dir" "$remap_file" <<'PY'
+import json
+import pathlib
+import sys
+import uuid
+
+base_dir = pathlib.Path(sys.argv[1])
+remap_file = pathlib.Path(sys.argv[2])
+pairs = json.load(remap_file.open(encoding="utf-8"))
+
+for path in base_dir.rglob("*"):
+    if not path.is_file() or path.is_symlink():
+        continue
+    raw = path.read_bytes()
+    if b"\x00" in raw:
+        continue
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError:
+        continue
+    updated = text
+    placeholders = []
+    for pair in pairs:
+        token = f"__OPENCLAW_REMAP_{uuid.uuid4().hex}__"
+        updated = updated.replace(pair["from"], token)
+        placeholders.append((token, pair["to"]))
+    for token, target in placeholders:
+        updated = updated.replace(token, target)
+    if updated != text:
+        path.write_text(updated, encoding="utf-8")
+PY
+}
+
+rewrite_agent_payload_files() {
+  local agent_root_dir="$1"
+  local workspace_dir="$2"
+  local remap_file="$3"
+  local target_workspace="$4"
+  [[ -d "$agent_root_dir" ]] || return 0
+  rewrite_text_paths_in_tree "$agent_root_dir" "$remap_file"
+  if [[ -d "$workspace_dir" ]]; then
+    rewrite_text_paths_in_tree "$workspace_dir" "$remap_file"
+  fi
+  if [[ -f "$agent_root_dir/agent.json" ]]; then
+    python3 - "$agent_root_dir/agent.json" "$target_workspace" <<'PY'
+import json
+import sys
+
+agent_json, target_workspace = sys.argv[1:]
+data = json.load(open(agent_json, encoding="utf-8"))
+data["workspace"] = target_workspace
+with open(agent_json, "w", encoding="utf-8") as fh:
+    json.dump(data, fh, ensure_ascii=False, indent=2)
+    fh.write("\n")
+PY
+  fi
+}
+
+rewrite_skill_payload_files() {
+  local install_payload_dir="$1"
+  local remap_file="$2"
+  [[ -d "$install_payload_dir" ]] || return 0
+  rewrite_text_paths_in_tree "$install_payload_dir" "$remap_file"
+}
+
 verify_skill_import() {
   local install_dir="$1"
   local archive_dir="$2"
-  local skill_name skill_key expected_entry
+  local skill_name skill_key
   skill_name="$(json_get "$archive_dir/meta/metadata.json" "name")"
   skill_key="$(json_get "$archive_dir/meta/metadata.json" "skillKey")"
 
@@ -443,10 +595,9 @@ for line in open(src, encoding='utf-8'):
 PY
 ) >/dev/null
 
-  openclaw_cmd skills info "$skill_name" --json >/dev/null
+  capture_openclaw_json "$archive_dir/meta/skill-info-after.json" skills info "$skill_name" --json
   if [[ "$(tr -d '[:space:]' <"$archive_dir/meta/skill-entry.json")" != "null" ]]; then
-    expected_entry="$(cat "$archive_dir/meta/skill-entry.json")"
-    openclaw_cmd config get "skills.entries[$(json_escape "$skill_key")]" --json >"$archive_dir/meta/actual-skill-entry.json" || true
+    capture_openclaw_json "$archive_dir/meta/actual-skill-entry.json" config get "skills.entries[$(json_escape "$skill_key")]" --json || true
     if [[ -s "$archive_dir/meta/actual-skill-entry.json" ]]; then
       python3 - "$archive_dir/meta/skill-entry.json" "$archive_dir/meta/actual-skill-entry.json" <<'PY'
 import json
@@ -484,15 +635,16 @@ PY
   if [[ -d "$archive_dir/payload/workspace/$agent_id" ]]; then
     target_workspace="$(json_get "$archive_dir/meta/agent-entry.json" "workspace")"
     [[ -d "$target_workspace" ]] || err "Imported workspace missing: $target_workspace"
-    verify_checksums "$(dirname "$target_workspace")" <(python3 - "$archive_dir/meta/checksums.txt" "$agent_id" <<'PY'
+    verify_checksums "$(dirname "$target_workspace")" <(python3 - "$archive_dir/meta/checksums.txt" "$agent_id" "$(basename "$target_workspace")" <<'PY'
 import sys
 src = sys.argv[1]
 agent_id = sys.argv[2]
+workspace_basename = sys.argv[3]
 for line in open(src, encoding='utf-8'):
     if line.strip():
         digest, kind, rel = line.rstrip('\n').split('  ', 2)
         if rel.startswith('workspace/'):
-            rel = rel.replace('workspace/' + agent_id + '/', agent_id + '/', 1)
+            rel = rel.replace('workspace/' + agent_id + '/', workspace_basename + '/', 1)
             print(f"{digest}  {kind}  {rel}")
 PY
 ) >/dev/null
@@ -504,7 +656,7 @@ PY
     [[ "$(sha256_file "$target_memory")" == "$(sha256_file "$archive_dir/payload/memory/$agent_id.sqlite")" ]] || err "Imported memory db hash mismatch"
   fi
 
-  openclaw_cmd agents list --json >"$archive_dir/meta/agents-after.json"
+  capture_openclaw_json "$archive_dir/meta/agents-after.json" agents list --json
   python3 - "$archive_dir/meta/agents-after.json" "$agent_id" <<'PY'
 import json
 import sys
@@ -514,7 +666,7 @@ if not any(item.get("id") == agent_id for item in agents):
     raise SystemExit("agent not visible in openclaw agents list")
 PY
 
-  openclaw_cmd agents bindings --agent "$agent_id" --json >"$archive_dir/meta/bindings-after.json"
+  capture_openclaw_json "$archive_dir/meta/bindings-after.json" agents bindings --agent "$agent_id" --json
   python3 - "$archive_dir/meta/bindings.json" "$archive_dir/meta/bindings-after.json" <<'PY'
 import json
 import sys
@@ -528,7 +680,8 @@ PY
 
 import_archive() {
   local archive_path="$1"
-  local state_dir tmp_dir item_type name skill_key source install_dir target_workspace merged_agents_json
+  local state_dir tmp_dir item_type name skill_key source install_dir merged_agents_json remap_file
+  local -a remap_args=("${REMAPS[@]-}")
   [[ -f "$archive_path" ]] || err "Archive not found: $archive_path"
   state_dir="$(state_dir_for_profile)"
   ensure_config_file
@@ -564,6 +717,11 @@ import_archive() {
         ;;
     esac
 
+    remap_file="$(mktemp)"
+    build_remap_file "$remap_file" "" "" "" "" "" "" "${remap_args[@]}"
+    rewrite_skill_payload_files "$tmp_dir/payload/skill/$name" "$remap_file"
+    write_checksums "$tmp_dir/payload" "$tmp_dir/meta/checksums.txt"
+
     remove_if_force "$install_dir"
     mkdir -p "$(dirname "$install_dir")"
     copy_path "$tmp_dir/payload/skill/$name" "$install_dir"
@@ -573,10 +731,20 @@ import_archive() {
     fi
 
     verify_skill_import "$install_dir" "$tmp_dir"
+    rm -f "$remap_file"
   elif [[ "$item_type" == "agent" ]]; then
-    local target_agent_root agent_model
+    local target_agent_root target_workspace agent_model rewritten_entry agents_list_json source_workspace source_agent_root
     target_agent_root="$state_dir/agents/$name"
+    source_workspace="$(json_get "$tmp_dir/meta/agent-entry.json" "workspace")"
+    source_agent_root="$(dirname "$source_workspace")"
+    rewritten_entry="$(mktemp)"
+    rewrite_agent_entry_paths "$tmp_dir/meta/metadata.json" "$tmp_dir/meta/agent-entry.json" "$state_dir" "$rewritten_entry"
+    mv "$rewritten_entry" "$tmp_dir/meta/agent-entry.json"
     target_workspace="$(json_get "$tmp_dir/meta/agent-entry.json" "workspace")"
+    remap_file="$(mktemp)"
+    build_remap_file "$remap_file" "$(json_get "$tmp_dir/meta/metadata.json" "sourceStateDir")" "$state_dir" "$source_agent_root" "$target_agent_root" "$source_workspace" "$target_workspace" "${remap_args[@]}"
+    rewrite_agent_payload_files "$tmp_dir/payload/agent-root/$name" "$tmp_dir/payload/workspace/$name" "$remap_file" "$target_workspace"
+    write_checksums "$tmp_dir/payload" "$tmp_dir/meta/checksums.txt"
     agent_model="$(python3 - "$tmp_dir/meta/agent-entry.json" <<'PY'
 import json, sys
 entry = json.load(open(sys.argv[1], encoding='utf-8'))
@@ -595,9 +763,11 @@ PY
     copy_path "$tmp_dir/payload/agent-root/$name" "$target_agent_root"
 
     if [[ -d "$tmp_dir/payload/workspace/$name" && -n "$target_workspace" ]]; then
-      remove_if_force "$target_workspace"
-      mkdir -p "$(dirname "$target_workspace")"
-      copy_path "$tmp_dir/payload/workspace/$name" "$target_workspace"
+      if [[ "$target_workspace" != "$target_agent_root/workspace" ]]; then
+        remove_if_force "$target_workspace"
+        mkdir -p "$(dirname "$target_workspace")"
+        copy_path "$tmp_dir/payload/workspace/$name" "$target_workspace"
+      fi
     fi
 
     if [[ -f "$tmp_dir/payload/memory/$name.sqlite" ]]; then
@@ -605,10 +775,12 @@ PY
       cp "$tmp_dir/payload/memory/$name.sqlite" "$state_dir/memory/$name.sqlite"
     fi
 
-    if ! openclaw_cmd agents list --json | python3 - "$name" <<'PY'
+    agents_list_json="$(mktemp)"
+    capture_openclaw_json "$agents_list_json" agents list --json
+    if ! python3 - "$name" "$agents_list_json" <<'PY'
 import json, sys
 agent_id = sys.argv[1]
-data = json.load(sys.stdin)
+data = json.load(open(sys.argv[2], encoding='utf-8'))
 raise SystemExit(0 if any(x.get("id") == agent_id for x in data) else 1)
 PY
     then
@@ -618,6 +790,7 @@ PY
         openclaw_cmd agents add "$name" --non-interactive --workspace "$target_workspace" --agent-dir "$target_agent_root/agent" >/dev/null
       fi
     fi
+    rm -f "$agents_list_json"
 
     merged_agents_json="$(mktemp)"
     merge_agent_entry "$tmp_dir/meta/agent-entry.json" "$merged_agents_json"
@@ -640,10 +813,11 @@ PY
     done
 
     if [[ -f "$target_workspace/IDENTITY.md" ]]; then
-      openclaw_cmd agents set-identity --agent "$name" --from-identity "$target_workspace/IDENTITY.md" >/dev/null || true
+      openclaw_cmd agents set-identity --agent "$name" --identity-file "$target_workspace/IDENTITY.md" --from-identity >/dev/null || true
     fi
 
     verify_agent_import "$state_dir" "$tmp_dir"
+    rm -f "$remap_file"
   else
     err "Unsupported archive itemType: $item_type"
   fi
@@ -690,6 +864,10 @@ while [[ $# -gt 0 ]]; do
       INSTALL_MODE="${2:-}"
       shift 2
       ;;
+    --remap)
+      REMAPS+=("${2:-}")
+      shift 2
+      ;;
     -h|--help)
       usage
       exit 0
@@ -728,227 +906,3 @@ case "$MODE" in
     exit 1
     ;;
 esac
-```
-
-执行权限：
-
-```bash
-cd /data/Documents/Obsidian/Work/2thBrain
-chmod +x scripts/openclaw_migrate.sh
-```
-
-## 3. 使用方法
-
-### 3.1 在 Ubuntu 源机器导出 skill
-
-```bash
-./scripts/openclaw_migrate.sh export skill send-email --output-dir ./migration_out
-```
-
-你会得到类似文件：
-
-```text
-./migration_out/openclaw-skill-send-email-20260316T120000Z.tgz
-```
-
-导出后先做一次归档校验：
-
-```bash
-./scripts/openclaw_migrate.sh verify-archive ./migration_out/openclaw-skill-send-email-20260316T120000Z.tgz
-```
-
-### 3.2 在 Ubuntu 源机器导出 agent
-
-```bash
-./scripts/openclaw_migrate.sh export agent oscar-assistant --output-dir ./migration_out
-```
-
-这个包会包含：
-
-- `agents/oscar-assistant`
-- 对应 workspace
-- `memory/oscar-assistant.sqlite`，如果存在
-- `agents.list` 中该 agent 的完整配置项
-- 路由绑定信息
-
-同样先校验归档：
-
-```bash
-./scripts/openclaw_migrate.sh verify-archive ./migration_out/openclaw-agent-oscar-assistant-20260316T120000Z.tgz
-```
-
-### 3.3 传到 MacBook
-
-可以用 `scp`、AirDrop、U 盘、Syncthing 任一种：
-
-```bash
-scp ./migration_out/openclaw-agent-oscar-assistant-20260316T120000Z.tgz user@macbook:~/Downloads/
-```
-
-### 3.4 在 MacBook 导入 skill
-
-```bash
-cd /path/to/your/script
-./scripts/openclaw_migrate.sh import ~/Downloads/openclaw-skill-send-email-20260316T120000Z.tgz
-```
-
-如果原 skill 是 workspace skill，并且你想强制装到受管目录：
-
-```bash
-./scripts/openclaw_migrate.sh import ~/Downloads/openclaw-skill-xxx.tgz --install-mode managed
-```
-
-### 3.5 在 MacBook 导入 agent
-
-```bash
-cd /path/to/your/script
-./scripts/openclaw_migrate.sh import ~/Downloads/openclaw-agent-oscar-assistant-20260316T120000Z.tgz
-```
-
-如果目标机上已存在同名 agent，需要覆盖：
-
-```bash
-./scripts/openclaw_migrate.sh import ~/Downloads/openclaw-agent-oscar-assistant-20260316T120000Z.tgz --force
-```
-
-## 4. 验证步骤
-
-### 4.1 skill 导入后的验证
-
-执行导入命令后，脚本会自动做 3 层验证：
-
-- 归档内 checksum 校验
-- 导入后目录文件校验
-- `openclaw skills info <skill>` 可见性校验
-
-你也可以手工再验一次：
-
-```bash
-openclaw skills info send-email --json
-openclaw skills list --json | rg '"name": "send-email"'
-```
-
-如果这个 skill 依赖配置项，再检查：
-
-```bash
-openclaw config get 'skills.entries["send-email"]' --json
-```
-
-### 4.2 agent 导入后的验证
-
-导入命令结束前，脚本会自动做：
-
-- agent 目录 checksum 校验
-- workspace checksum 校验
-- memory sqlite hash 校验
-- `openclaw agents list --json` 可见性校验
-- `openclaw agents bindings --agent <id> --json` 绑定一致性校验
-
-你也可以手工复验：
-
-```bash
-openclaw agents list --json | rg '"id": "oscar-assistant"'
-openclaw agents bindings --agent oscar-assistant --json
-openclaw config get agents.list --json
-```
-
-如果该 agent 使用 workspace 身份文件，还可以额外检查：
-
-```bash
-ls ~/.openclaw/agents/oscar-assistant
-ls ~/.openclaw/agents/oscar-assistant/agent
-ls ~/.openclaw/agents/oscar-assistant/sessions
-```
-
-## 5. 推荐的演练方式
-
-先不要直接打到正式环境，先用官方 profile 隔离能力做一次彩排：
-
-```bash
-./scripts/openclaw_migrate.sh import ./migration_out/openclaw-skill-send-email-20260316T120000Z.tgz --profile migrate-test
-openclaw --profile migrate-test skills info send-email --json
-```
-
-agent 也一样：
-
-```bash
-./scripts/openclaw_migrate.sh import ./migration_out/openclaw-agent-oscar-assistant-20260316T120000Z.tgz --profile migrate-test
-openclaw --profile migrate-test agents list --json
-openclaw --profile migrate-test agents bindings --agent oscar-assistant --json
-```
-
-官方 `openclaw --profile <name>` 会把状态隔离到 `~/.openclaw-<name>`，很适合做迁移验收。
-
-## 6. 实测结果
-
-2026-03-16 已按本文流程完成一轮实际验证，使用的样例对象是：
-
-- skill: `weather-query`
-- agent: `finance-kids`
-- 隔离 profile: `migrate-test-codex`
-
-验证结果：
-
-- `bash -n` 语法检查通过
-- `export skill weather-query` 成功，`verify-archive` 通过
-- `export agent finance-kids` 成功，`verify-archive` 通过
-- skill 在隔离 profile 中 `import` 成功，`openclaw --profile migrate-test-codex skills info weather-query --json` 可见
-- agent 在隔离 profile 中 `import --force` 成功，`openclaw --profile migrate-test-codex agents list --json` 可见 `finance-kids`
-- `openclaw --profile migrate-test-codex agents bindings --agent finance-kids --json` 返回空数组，与源 agent 当前无绑定一致
-
-本轮实测中顺手修掉了两个脚本缺陷：
-
-- 当 agent 的默认 workspace 就在 `~/.openclaw/agents/<id>/workspace` 时，导入阶段不再重复拷贝同一路径，避免冲突
-- workspace 校验改为按目标 workspace 的真实 basename 做映射，不再把目标目录名写死成 `agent_id`
-
-## 7. 注意事项
-
-### 全局凭据和通道
-
-即使 agent/skill 已迁过去，下面这些通常仍需你在目标机单独确认：
-
-- 渠道登录态
-- 设备配对信息
-- 第三方 API token 是否在目标机有效
-- 插件本体是否也已安装
-
-原因不是脚本做不到，而是这些内容属于整机级别安全资产，不建议混在定向 agent/skill 迁移包里。
-
-### 配置文件解析说明
-
-脚本会读取 `openclaw.json` 中对应条目。因为 OpenClaw 配置文件通常是 JSON5/对象字面量风格，脚本用 Node 的对象字面量解析方式提取目标 `skill` 或 `agent` 配置，然后用官方 `openclaw config set` 写回目标机。这么做的目的，是尽量贴合 OpenClaw 官方的配置读写方式，而不是用 `sed` 生改配置。
-
-## 8. 建议的迁移顺序
-
-如果你的 agent 依赖某些 skill，顺序建议是：
-
-1. 先迁 skill
-2. 在目标机验证 skill 可见、配置到位
-3. 再迁 agent
-4. 最后验证 bindings、workspace、memory
-
-## 9. 已知限制
-
-- 如果某个 agent 依赖目标机本地独有的插件、channel、browser、sandbox、系统二进制，这些外部依赖仍需你在目标机单独准备
-- 如果 workspace 路径被你手工改成了非常规目录，脚本会按配置中的原路径落地；因此导入前要确保目标机对该路径有写权限
-- 如果你想迁整机，而不是迁单个 agent/skill，建议直接走官方 `openclaw backup create` / `openclaw backup verify`
-
-## 10. 最小命令清单
-
-```bash
-# 导出 skill
-./scripts/openclaw_migrate.sh export skill send-email --output-dir ./migration_out
-
-# 导出 agent
-./scripts/openclaw_migrate.sh export agent oscar-assistant --output-dir ./migration_out
-
-# 验 archive
-./scripts/openclaw_migrate.sh verify-archive ./migration_out/openclaw-agent-oscar-assistant-*.tgz
-
-# 在目标机导入
-./scripts/openclaw_migrate.sh import ./migration_out/openclaw-agent-oscar-assistant-*.tgz
-
-# 在隔离 profile 验证
-openclaw --profile migrate-test agents list --json
-openclaw --profile migrate-test skills list --json
-```
