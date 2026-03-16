@@ -1,0 +1,1 @@
+alias claudx='claude --allowedTools "Bash(*)" --permission-mode acceptEdits'
