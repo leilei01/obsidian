@@ -1,119 +1,99 @@
 ---
 title: "AI 编程日报 - 2026-03-19"
 date: 2026-03-19
-time: "00:53"
+time: "09:33"
 tags: [ai-coding, daily-digest]
 ---
 
 # AI 编程日报 - 2026-03-19
 
-> 生成时间: 00:53 | 数据源: Tavily + Search Pro (多引擎聚合), GitHub, HN, Reddit, InfoQ, freeCodeCamp, GitHub Blog, 量子位, 机器之心, arXiv, Papers with Code, 大厂博客, FutureTools, 掘金, 知乎
+> 生成时间: 09:33 | 数据源: Tavily + Search Pro (多引擎聚合), GitHub, HN, Reddit, InfoQ, freeCodeCamp, GitHub Blog, 量子位, 机器之心, arXiv, Papers with Code, 大厂博客, FutureTools, 掘金, 知乎
 > 翻译: kimi2.5
 
 ---
 
 > [!abstract] 今日摘要
-> 今日AI编程领域最重要的动态包括：Anthropic的Claude AI代理被发现存在三处连锁漏洞"Claudy Day"，攻击者可通过Google搜索在预填充聊天URL中嵌入恶意指令窃取用户数据；澳大利亚制造业正加速AI应用以提升工厂运营效率和生产力；此外，AI在军事决策中的使用引发争议，同时"生产力悖论"问题重现——数千名CEO承认AI尚未对就业或生产力产生显著影响，这与40年前技术变革短期内反而降低生产力的经济学现象相呼应。
+> 今日AI编程领域的重要动态包括：法律行业正借助AI实时分析诉讼趋势和案例数据以赢得新业务；Google软件工程师角色正从编码转向设计和管理，AI已承担半数代码编写工作；vibe-coding工作坊兴起，帮助非技术人员在极短时间内掌握AI应用构建技能。
 
 ---
 
 ## AI 编程工具动态
 > [!tip] Cursor, Copilot, Claude Code, Windsurf, Aider 等最新动态
 
-- **'Claudy Day' 三重漏洞使 Claude 用户面临数据盗窃风险 - Dark Reading** (tavily)
-  https://www.darkreading.com/vulnerabilities-threats/claudy-day-trio-flaws-claude-users-data-theft
-  Anthropic 的 Claude 人工智能 (AI) 代理中发现的三处独立漏洞构成的攻击链，可能允许攻击者通过 Google 搜索在预填充聊天 URL 中嵌入恶意隐藏指令、窃取敏感用户数据，并使用户暴露于看似正常的恶意链接。
+- **To Win New Business, Become an AI Futurist - Law.com** (tavily)
+  https://www.law.com/newyorklawjournal/2026/03/18/to-win-new-business-become-an-ai-futurist/
+  动态探索和比较律师事务所、公司、个人律师和行业趋势的数据。实时获取新的州和联邦诉讼警报，以及无限制的诉状访问、专家案例摘要和 AI 增强的趋势检测。# To Win New Business, Become an AI Futurist. ## Columb
 
-- **Cursor vs Windsurf vs Claude Code: 2026 年最佳 AI 编程工具 ...** (tavily)
-  https://www.nxcode.io/resources/news/cursor-vs-windsurf-vs-claude-code-2026
-  Cursor vs Windsurf vs Claude Code: 2026 年最佳 AI 编程工具（现已支持 Sonnet 4.6）。# Cursor vs Windsurf vs Claude Code: 2026 年最佳 AI 编程工具（现已支持 Sonnet 4.6）。# Cursor vs Windsurf vs Cl...
+- **The leaderboard "you can't game," funded by the companies it ranks - TechCrunch** (tavily)
+  https://techcrunch.com/video/the-leaderboard-you-cant-game-funded-by-the-companies-it-ranks/
+  观看 Equity 主持人 Rebecca Bellan 与 Arena 联合创始人 Anastasios Angelopoulos 和 Wei-Lin Chiang 的对话，了解他们的平台如何成为前沿 AI 模型的首选排行榜，以及他们如何尝试建立一个中立基准，即使 OpenAI、Google 和 Anthropic 等公司为其提供支持
 
-- **大多数开发者选错了 AI 编程工具。以下是正确选择方法...** (tavily)
-  https://www.linkedin.com/posts/dominicutz_most-developers-pick-the-wrong-ai-coding-activity-7421585472566501376-Jxbe
-  GitHub Copilot 在 Microsoft/GitHub 生态系统中领先，为团队提供跨 50 多种语言的无缝内联建议。(https://lnkd.in/dicg-cn3) Cursor 是一款从 VS Code 分叉的 AI 原生 IDE，在...
+- **Best AI for Coding in 2026: 10 Tools Ranked from Free to Enterprise** (tavily)
+  https://www.nxcode.io/resources/news/best-ai-for-coding-2026-tools-ranked
+  2026 年最佳 AI 编程工具：从免费到企业级的 10 款工具排名。# Best AI for Coding in 2026: 10 Tools Ranked from Free to Enterprise. # Best AI for Coding in 2026: 10 Tools Ranked from Free to E...
 
-- **2026 年最佳 AI 编程代理：真实开发者评测** (tavily)
-  https://www.faros.ai/blog/best-ai-coding-agents-2026
-  [](https://www.faros.ai/blog/best-ai-coding-agents-2026#). https://www.faros.ai/blog/best-ai-coding-agents-2026. [](https://www.faros.ai/blog/best-ai-coding-agents-2026#). https://www.faros.ai/blog/be...
+- **How to choose your coding assistants | by Karun Japhet - Medium** (tavily)
+  https://medium.com/inspiredbrilliance/how-to-choose-your-coding-assistants-ddf693804cb6
+  Cursor、Windsurf、Claude Code、Gemini CLI、Codex、Aider、OpenCode、JetBrains AI 等编程助手。TL;DR: OpenCode > Claude Code > Aider > Copilot > \*. Claude Code 和 Gemini CLI 等工具...
 
-- **关于部署 Cursor 和 Claude Code 的笔记 | Hacker News** (tavily)
-  https://news.ycombinator.com/item?id=43927914
-  | | | |  | | --- | | tptacek 10 个月前  | parent | prev | next )   这是编程代理最令人兴奋的一点：它们让许多工具变得易于使用，而这些工具以前因过于繁琐而不切实际...
-
-- **我测试了所有 AI 编程工具 6 个月。只有 3 个值得使用。** (tavily)
-  https://blog.stackademic.com/i-tested-every-ai-coding-tool-for-6-months-only-3-are-worth-using-2e35d7e62f16
-  ChatGPT、Copilot、Claude、Cursor —— 我全部测试过了。以下是真正能提升效率的工具（以及浪费时间的工具）。
-
-- **Claude、Cursor、GitHub Copilot 和 OpenAI 的 AI 驱动编程对比...** (tavily)
-  https://www.linkedin.com/posts/thescholarbaniya_claude-vs-cursor-vs-github-vs-openai-ive-activity-7430106391723376640-UkJi
-  ✓ 简而言之：• Claude Code → 最适合大型复杂代码库 • Cursor → 全职开发者的最佳日常伴侣 • GitHub Copilot →
+- **AI Coding Agent Showdown: 10 Top Tools Compared - Patrick Hulce** (tavily)
+  https://blog.patrickhulce.com/blog/2025/ai-code-comparison
+  它没有直接使用 AGENTS.md 中关于正确调用的描述或查看 `package.json` 文件，而是尝试用霰弹枪式的方法测试所有能想到的测试运行器命令...
 
 ---
 
 ## 企业 AI 编程落地案例
 > [!example] 企业采用 AI 编程的成功案例与 ROI 分析
 
-- **AI in Manufacturing in Australia: Key Use Cases & Future - appinventiv.com** (tavily)
-  https://appinventiv.com/blog/ai-in-manufacturing-australia/
-  # 澳大利亚制造业中的AI如何改变工厂运营并提高生产力。* Appinventiv如何帮助澳大利亚制造商大规模实施AI？本博客探讨了AI在澳大利亚企业制造业中在哪些领域带来了可衡量的生产力提升
+- **Google's software engineers are shifting from coding to calling the shots - Business Insider** (tavily)
+  https://www.businessinsider.com/ai-coding-changing-software-developer-role-2026-3
+  * AI-driven coding is reshaping tech jobs, shifting developers to design and management roles. In October, Google's leadership said AI agents are writing half of all code. A 2025 report from Dora, a Google Cloud research program, surveyed 5,000 tech professionals around the world and found that 90% 
 
-- **AI code generation: Best practices for enterprise adoption in 2025** (tavily)
-  https://getdx.com/blog/ai-code-enterprise-adoption/
-  从高影响力用例开始：堆栈跟踪分析、代码重构和测试生成对大多数企业团队来说能提供最高的ROI。
+- **Microsoft, Oracle seen as benefiting from AI, while Adobe, Docusign at risk: Jefferies (MSFT:NASDAQ) - Seeking Alpha** (tavily)
+  https://seekingalpha.com/news/4565944-microsoft-oracle-seen-as-benefiting-from-ai-while-adobe-docusign-at-risk-jefferies
+  # Microsoft, Oracle seen as benefiting from AI, while Adobe, Docusign at risk: Jefferies. Following an artificial intelligence-themed survey with 30 chief information officers, investment firm Jefferies said Microsoft (MSFT), Snowflake (SNOW), and Oracle (ORCL) are its top picks in enterprise softwa
 
-- **AI ROI: Why Only 5% of Enterprises See Real Returns in 2026** (tavily)
-  https://masterofcode.com/blog/ai-roi
-  本文是一项**AI ROI分析**，基于对IBM、Deloitte和McKinsey等全球领导者16份最新研究报告的元分析，结合跨行业的18个真实成功案例...
+- **How AI Coding Tools Are Impacting Productivity - Waydev** (tavily)
+  https://waydev.co/ai-coding-tools-are-impacting-productivity/
+  * AI coding tools like GitHub Copilot and Cursor enhance software development efficiency, but their impact on productivity is complex. * Software Engineering Intelligence platforms like Waydev help tr...
 
 ---
 
 ## AI 编程生态 (MCP / Agent / 框架)
 > [!info] 基础设施与工具链变化
 
-- **Model Context Protocol** (tavily)
-  https://en.wikipedia.org/wiki/Model_Context_Protocol
-  Model Context Protocol (MCP) 是由 Anthropic 于 2024 年 11 月推出的一项开放标准和开源框架，旨在规范人工智能的集成方式
+- **What is the Model Context Protocol (MCP)? - Databricks** (tavily)
+  https://www.databricks.com/blog/what-is-model-context-protocol
+  Model Context Protocol (MCP) 是一种开放标准，使 AI 应用程序能够与外部数据源、工具和系统无缝连接。可以将 Model Context Protocol 想象成 USB-C 接口...
 
-- **Which agentic AI framework works best with the MCP ...** (tavily)
-  https://www.reddit.com/r/mcp/comments/1ooy1li/which_agentic_ai_framework_works_best_with_the/
-  我正在构建一个多智能体 AI 系统，并计划基于 MCP 生态系统。我一直在研究 LangGraph、Toolformer、LlamaIndex，
+- **The Model Context Protocol (MCP): A Game-Changer for Agentic AI** (tavily)
+  https://medium.com/@goynikhil/the-model-context-protocol-mcp-a-game-changer-for-agentic-ai-6a55c180efb4
+  # The Model Context Protocol (MCP): A Game-Changer for Agentic AI …第一部分。本系列文章旨在从开发者的角度，对 Model Context Protocol (MCP) 进行清晰且实用的概述...
 
-- **Building an AI Agent with Model Context Protocol (MCP)** (tavily)
-  https://pub.towardsai.net/building-an-ai-agent-with-model-context-protocol-mcp-a-complete-guide-37b8f6cd7b2b
-  从理论到实践：了解 Model Context Protocol (MCP) 如何解决 AI 集成挑战，同时构建一个天气和搜索智能体
+- **What is the Model Context Protocol (MCP)? - Model Context Protocol** (tavily)
+  https://modelcontextprotocol.io/docs/getting-started/intro
+  MCP (Model Context Protocol) 是一种用于将 AI 应用程序连接到外部系统的开源标准。使用 MCP，像 Claude 这样的 AI 应用程序可以
 
 ---
 
 ## 模型能力更新
 > [!warning] 影响 AI 编程的重大模型发布与评测
 
-- **AI — Used In Deciding To Attack Iran, Productivity Paradox, Suicide Instigator … - CleanTechnica** (tavily)
-  https://cleantechnica.com/2026/03/17/ai-used-in-deciding-to-attack-iran-productivity-paradox-suicide-instigator/
-  另一篇近期文章的标题是"数千名CEO刚刚承认AI对就业或生产力没有影响——这让经济学家们重新提起了一个40年前的悖论"。基本问题是，由于技术的巨大变革而颠覆现有的做事方式，可能会导致生产力下降
+- **我参加了一个 vibe-coding 工作坊，学习如何在两个上午内构建应用。以下是我的 5 大收获。 - Business Insider** (tavily)
+  https://www.businessinsider.com/vibe-coding-takeaways-weekend-class-build-apps-non-technical-people-2026-3
+  # 我参加了一个 vibe-coding 工作坊，学习如何在两个上午内构建应用。* 我参加了一个周末 vibe-coding 课程，学习如何用 AI 构建应用。更重要的是，我带着对如何更好地构建、vibe coding 中什么最重要，以及非技术构建者通常...
 
-- **AI Model Releases Nov/Dec 2025: Grok 4.1, Gemini 3, Claude 4.5 ...** (tavily)
-  https://vertu.com/lifestyle/the-ai-model-race-reaches-singularity-speed/?srsltid=AfmBOopl6tUpUAthis8TsqV4VTLb8TIq0X42h0TC80lmHBotPqQ2GeTL&srsltid=AfmBOop7gUO_8QXzrPqHUoGyF4O12DXyTJMAnh3pEDlri3DX98MCUDaS&srsltid=AfmBOooe7_dpJWxTTfAyslHbaXxd-KWSgTbCaUfmgB_Gp-zjsoL5hiR1&srsltid=AfmBOoq5kEl9Ev4ttwoWiWCFKJT2OryBPErSxpWVE-DEBIgVS5W1ZLHj
-  在短短25天内，四家主要AI公司发布了他们迄今为止最强大的模型：xAI的Grok 4.1（11月17日）、Google的Gemini 3（11月18日）、Anthropic的Claude Opus 4.5（11月24日），以及Open...
+- **2025年11月/12月 AI 模型发布：Grok 4.1、Gemini 3 ...** (tavily)
+  https://vertu.com/lifestyle/the-ai-model-race-reaches-singularity-speed/?srsltid=AfmBOopl6tUpUAthis8TsqV4VTLb8TIq0X42h0TC80lmHBotPqQ2GeTL&srsltid=AfmBOop7gUO_8QXzrPqHUoGyF4O12DXyTJMAnh3pEDlri3DX98MCUDaS&srsltid=AfmBOooe7_dpJWxTTfAyslHbaXxd-KWSgTbCaUfmgB_Gp-zjsoL5hiR1&srsltid=AfmBOop2hnD-wBp8dWdlr2MP2mZBpLtKHYpbf-8OURz-1daG_X6b93h-
+  在短短 25 天内，四家主要 AI 公司发布了他们迄今为止最强大的模型：xAI 的 Grok 4.1（11月17日）、Google 的 Gemini 3（11月18日）、Anthropic 的 Claude Opus 4.5（11月24日），以及 Open...
 
-- **ChatGPT vs Claude vs Gemini for Coding 2026 (Honest Comparison)** (tavily)
-  https://playcode.io/blog/chatgpt-vs-claude-vs-gemini-coding-2026
-  ChatGPT vs Claude vs Gemini for Coding 2026 (Honest Comparison) | PlayCode Blog. [AI Website Builder](https://playcode.io/)[For Founders](https://playcode.io/for-founders)[For Small Business](https://...
+- **Claude (语言模型)** (tavily)
+  https://en.wikipedia.org/wiki/Claude_(language_model)
+  2024年6月，Anthropic 向 Claude 发布了 Projects 功能，首先面向付费用户。Claude 2 于2023年7月发布，成为 Anthropic 首个向公众开放的模型。5月2日...
 
-- **Claude 4 vs GPT-4o vs Gemini 2.5 Pro: Which AI Codes Best in 2025?** (tavily)
-  https://www.analyticsvidhya.com/blog/2025/05/best-ai-for-coding/
-  # Claude 4 vs GPT-4o vs Gemini 2.5 Pro: Which AI Codes Best in 2025? 面对Anthropic的Claude 4、OpenAI的GPT-4o和Google的Gemini 2.5 Pro等众多顶级性能模型，竞争十分激烈...
-
-- **AI Guide 2026: GPT-5.2, Claude 4.5, Gemini 3 & Llama 4 Compared** (tavily)
-  https://www.adwaitx.com/ai-implementation-guide-2026-models-tools/
-  [Facebook](https://www.facebook.com/sharer.php?u=https%3A%2F%2Fwww.adwaitx.com%2Fai-implementation-guide-2026-models-tools%2F "Facebook")[X](https://x.com/intent/post?text=Complete+Guide+to+Artificial...
-
-- **I Found the Best A.I. for Coding - YouTube** (tavily)
-  https://www.youtube.com/watch?v=KbbXjbX2Hec
-  最受欢迎的AI编程模型：Gemini 2.5 Pro、Claude 3.5 Sonnet、Claude 3.7 Sonnet、GPT 4o和o3-mini-high（以及中等推理）。在
-
-- **I Pitted Gemini, Claude, and GPT in a 4-Stage AI 'Code-Off.' - Medium** (tavily)
-  https://medium.com/@Jaraxal/i-pitted-gemini-claude-and-gpt-in-a-4-stage-ai-code-off-f99b5be719b8
-  这场四阶段"编程对决"有一个明确的赢家：Google的Gemini 2.5 Pro是唯一一次就生成正确、可运行脚本的模型。我没有
+- **AI 编程工具：我测试了 Claude、Gemini 和 Copilot 30 ...** (tavily)
+  https://juliangoldie.com/ai-coding-tools-i-tested-claude-gemini-copilot-for-30-hours-one-destroyed-the-others/
+  Google 推出了 Gemini 2.5 Flash，配备可处理 100 万 token 的 AI 编程工具。Anthropic 发布了 Claude Sonnet 4.5，作为永不休眠的 AI 编程工具。
 
 ---
 
@@ -125,68 +105,97 @@ tags: [ai-coding, daily-digest]
 
 ### 关键仓库最新发布
 
-(近期无新发布)
+- **Aider-AI/aider** `v0.86.0` (2025-08-09)
+  https://github.com/Aider-AI/aider/releases/tag/v0.86.0
+  - Added support for all GPT-5 models.
+- Added support for Grok-4 via `xai/grok-4` and `openrouter/x-ai/grok-4` model names.
+- Added support for `gem
+
+- **continuedev/continue** `v1.2.17-vscode` (2026-03-13)
+  https://github.com/continuedev/continue/releases/tag/v1.2.17-vscode
+  ## What's Changed
+* chore: move .continue/agents to .continue/checks by @sestinj in https://github.com/continuedev/continue/pull/10596
+* Add banner 
+
+- **anthropics/anthropic-sdk-python** `v0.86.0` (2026-03-18)
+  https://github.com/anthropics/anthropic-sdk-python/releases/tag/v0.86.0
+  ## 0.86.0 (2026-03-18)
+
+Full Changelog: [v0.85.0...v0.86.0](https://github.com/anthropics/anthropic-sdk-python/compare/v0.85.0...v0.86.0)
+
+### Feature
+
+- **modelcontextprotocol/servers** `2026.1.26` (2026-01-27)
+  https://github.com/modelcontextprotocol/servers/releases/tag/2026.1.26
+  # Release : v2026.1.26
+
+## Updated packages
+- @modelcontextprotocol/server-everything@2026.1.26
+- @modelcontextprotocol/server-memory@2026.1.26
+- mcp-
+
+- **TabbyML/tabby** `v0.32.0` (2026-01-25)
+  https://github.com/TabbyML/tabby/releases/tag/v0.32.0
+  ## 🚀 Features
+
+* Add support for mistral/embedding api kind. [#4380](https://github.com/TabbyML/tabby/pull/4380)
+* Add generic OAuth support. [#43
+
 
 ---
 
 ## 技术博客精选
 > [!note] freeCodeCamp, GitHub Blog, Google AI, OpenAI, Anthropic, Meta, Microsoft 等
 
-- **OpenAI's Wake Up Call - Forbes** (大厂博客)
-  https://www.forbes.com/sites/the-prompt/2026/03/18/openais-wake-up-call/
-  这家以核心聊天机器人 ChatGPT 闻名的 AI 巨头，在过去一年推出了多款产品，包括烧钱严重的视频生成应用 Sora（据报道，2026 年初使用量急剧下降）以及一款新的 AI 驱动网页浏览器。两年前，Replit CEO Amjad Masad 邀请了 Paul Graham，t
+- **DOD 称 Anthropic 的"红线"使其成为"对国家安全的不可接受风险" - TechCrunch** (大厂博客)
+  https://techcrunch.com/2026/03/18/dod-says-anthropics-red-lines-make-it-an-unacceptable-risk-to-national-security/
+  美国国防部周二晚间表示，Anthropic 构成了"对国家安全的不可接受风险"，这是该机构首次回应这家 AI 实验室提起的诉讼，这些诉讼挑战了国防部长 Pete Hegseth 上月将该公司列为供应链风险的决定。Several tec
 
-- **OpenClaw Explained: The Free AI Agent Tool Going Viral Already in 2026 - KDnuggets** (大厂博客)
-  https://www.kdnuggets.com/openclaw-explained-the-free-ai-agent-tool-going-viral-already-in-2026
-  # OpenClaw 详解：2026 年已迅速走红的免费 AI Agent 工具。拥有 100 多项内置技能，OpenClaw 将 AI 模型直接连接到应用、浏览器和系统工具。## 了解 OpenClaw 的功能。OpenClaw 是一个免费的、开源的 agent，在本地运行并连接大型语言
+- **Google 稳坐钓鱼台，AI 竞争对手竞相争取五角大楼青睐 - The New York Times** (大厂博客)
+  https://www.nytimes.com/2026/03/18/technology/google-ai-pentagon.html
+  # Google 稳坐钓鱼台，AI 竞争对手竞相争取五角大楼青睐 - The New York Times. # Google 稳坐钓鱼台，AI 竞争对手竞相争取五角大楼青睐. Google 曾在 2018 年发誓放弃军事工作，如今正悄悄重建与国防部的关系。Credit...Kelsey McClellan for The New
 
-- **AI dev tool power rankings & comparison [March 2026]** (大厂博客)
-  https://blog.logrocket.com/ai-dev-tool-power-rankings/
-  Claude 4.6 Opus – 技术领导者 ↔️](https://blog.logrocket.com/ai-dev-tool-power-rankings/#claude-4-6-opus-technical-leader)。Gemini 3.1 Pro – 效率冠军 ![Image 3: 🆕](https://s.w....
+- **为何所有人都在谈论 Anthropic 的新 AI 工具** (大厂博客)
+  https://medium.com/illumination/why-everyone-is-talking-about-anthropics-new-ai-tool-2df1554194e6
+  了解为何 Anthropic 的新 AI 工具在 2026 年主导了各方讨论。探索其突破性能力、安全架构，
 
-- **AI Predictions for 2026 + my 2025 Recap - AI Pioneers at Work** (大厂博客)
-  https://jessleao.substack.com/p/ai-predictions-for-2026-my-2025-recap
-  [![Image 1: AI Pioneers at Work](https://substackcdn.com/image/fetch/$s_!73k8!,w_40,h_40,c_fill,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fim...
-
-- **Research - Anthropic** (大厂博客)
-  https://www.anthropic.com/research
-  *   [Research](https://www.anthropic.com/research)。*   [News](https://www.anthropic.com/news)。自我们上次撰文以来，Claude 的业务发展如何？](https://www.anthropic.com/research/project-vend-2)....
-
-- **What's next in AI: 7 trends to watch in 2026 - Microsoft Source** (大厂博客)
-  https://news.microsoft.com/source/features/ai/whats-next-in-ai-7-trends-to-watch-in-2026/
-  *   [AI](https://news.microsoft.com/source/topics/ai/)。*   [Windows](https://www.microsoft.com/en-us/windows/)。*   [Deals](https://www.microsoft.com/en-us/store/b/sale?icid=DSM_TopNavDeals)。*   [Co...
+- **AI 综合更新：2026 年 3 月 4–10 日** (大厂博客)
+  https://www.linkedin.com/pulse/comprehensive-ai-updates-march-410-2026-dhanushkumar-r-dqx2c
+  ![Image 1](https://www.linkedin.com/pulse/comprehensive-ai-updates-march-410-2026-dhanushkumar-r-dqx2c). [Skip to main content](https://www.linkedin.com/pulse/comprehensive-ai-updates-march-410-2026-d...
 
 ---
 
 ## InfoQ 精选
 > [!note] InfoQ 中英文站 AI 编程深度文章
 
-(今日暂无相关内容)
+- **从零构建智能体：面向 AI 智能体的端到端数据管道搭建实战 ｜ 技术实践** (InfoQ CN)
+  https://www.infoq.cn/article/Q7g7WJDk9lBPGGmkMqqb
+  点击查看原文>
 
 ---
 
 ## 中文社区
 > [!note] 量子位, 机器之心, 掘金, 知乎
 
-- **课程合集实战课AI+Cursor辅助开发多模态全栈项目** (掘金)
-  https://juejin.cn/post/7599927813601755176
-  GitHub Copilot已过时？2026最火AI编程工具Cursor实战全链路教学！ 随着大模型技术从“辅助补全”迈向“上下文驱动的智能协作者”，AI编程工具正经历代际跃迁。
+- **全行业都在忙着“吃虾”，MiniMax M2.7已经让虾自己拿起筷子了** (量子位)
+  https://www.qbitai.com/2026/03/389024.html
+  大模型自我进化时代来了
 
-- **2026年AI效率工具实战测评：5款让工作效率提升300%的神器，附职场成长方法论拆解与副业变现案例** (知乎)
-  https://zhuanlan.zhihu.com/p/2015158806506660656
-  测完102款AI工具后，我真正留下的只有这5款——它们不仅让我每天节省3小时，更重构了我的工作逻辑与成长路径。一、 写在前面：当AI工具泛滥成“灾”，
+- **2026年大模型怎么选？前端人实用对比本文主要介绍如何选择大模型和开发工具IDE，介绍免费的工具和模型，也对coding** (掘金)
+  https://juejin.cn/post/7612550294665314350
+  你有没有过这样的经历？ 打开一个AI编程工具，纠结半天该选哪个模型。有人说Claude最强，有人说GPT好用，还有人说免费的DeepSeek足够用了。
 
-- **豆包MarsCode AI 编程助手提效实战** (知乎)
-  https://zhuanlan.zhihu.com/p/16006957290
-  近年来，开发者正迈入一个由AI 引领的“大模型时代”，IDE 开发工具快速崛起，大语言模型在代码生成领域取得了令人瞩目的进展。本文整理自豆包MarsCode
+- **2026年AI编程现状：说"AI代替程序员"的，基本都是外行** (掘金)
+  https://juejin.cn/post/7613652045742161947
+  深度长文。基于Claude 4.6、GitHub Copilot、Cursor等工具的实际测试数据，以及Anthropic、OpenAI最新技术报告的分析。 一、先摆数据：AI编程
 
-- **从分享AI，到与AI共舞—大模型真好玩的2025总结** (知乎)
-  https://zhuanlan.zhihu.com/p/1989679755755266050
-  零门槛！手把手教你用VS Code + DeepSeek 免费玩转AI编程！（5分钟编写 ... 这不仅仅是效率工具，更是一个想法的“快速成型机” 。我利用Trae Solo
+- **Java开发者的AI革命：6大提效工具让编码效率翻倍！** (知乎)
+  https://zhuanlan.zhihu.com/p/1896906126387298867
+  引言1 AI 代码生成：告别重复劳动，释放创造力1.1 GitHub Copilot：全球化开发者的首选1.2 阿里云CodeWhisperer：本土化开发的“最懂中文”工具1.3 Tabnine：
 
-- **零基础AI编程实战复盘！如何仅用7天做出2个网站？** (知乎)
-  https://zhuanlan.zhihu.com/p/1919385698252875485
-  这次实验我主要使用了大热的Flowith Neo 和Manus 这两个通用Agent，感受到了Agent 对Coding 效率的极度提升，让我有更多时间聚焦内容本身，而非局限于分享
+- **2025年AI大模型开发技术栈深度解析：框架、训练、部署全 ...** (知乎)
+  https://zhuanlan.zhihu.com/p/1982042650120065669
+  “AI 结对编程” 已从辅助工具升级为核心生产力：. GitHub Copilot X：结合代码理解与Agent 能力，可自动生成单元测试与文档，使开发效率提升35%。 通
 
 ---
 
@@ -200,17 +209,41 @@ tags: [ai-coding, daily-digest]
 ## 工具与资源
 > [!tip] FutureTools, RadarAI, Awesome AI Coding, Copilot/Cursor 更新日志
 
-- **v0.dev** (FutureTools)
-  https://futuretools.io/tools/v0-dev
-  V0 是由 Vercel Labs 开发的生成式用户界面系统，由 AI 驱动。它基于 Shadcn UI 和 Tailwind CSS 创建兼容的 React 代码。
+- **Write nsfw code** (FutureTools)
+  https://theresanaiforthat.com/s/write+nsfw+code/
+  浏览 0 个 Write nsfw code AI 工具。包含 Virtual girlfriend、Stories、NSFW images、Videos 和 Image editing 等任务。
 
-- **通过光遗传学调控神经元-星形胶质细胞相互作用抑制癫痫的非线性动力学 - Nature** (Changelog)
-  https://www.nature.com/articles/s41598-026-42663-0
-  通过光遗传学调控神经元-星形胶质细胞相互作用抑制癫痫的非线性动力学。# 通过光遗传学调控神经元-星形胶质细胞相互作用抑制癫痫的非线性动力学。这些发现突出了星形胶质细胞作为大脑兴奋性的主动调节器，并确定了 Na
+- **Newest AI Tools - There's An AI For That®** (FutureTools)
+  https://theresanaiforthat.com/just-released/
+  新功能（上个月）核心产品 • 25+ AI 模型选择 — 按套餐分级（免费：3 个模型，Writer：12+，Author：19+，Pro：26+），包括 GPT-4o、Claude、Gemini、DeepSeek、Llama • Chapter qualit...
 
-- **即将弃用部分 GitHub Copilot 模型...** (Changelog)
-  https://github.blog/changelog/2026-01-13-upcoming-deprecation-of-select-github-copilot-models-from-claude-and-openai/
-  [跳转到内容](https://github.blog/changelog/2026-01-13-upcoming-deprecation-of-select-github-copilot-models-from-claude-and-openai/#start-of-content)[跳转到侧边栏](https://github.blog/changelog...
+- **2 Major AI Coding Tools Go Rogue** (FutureTools)
+  https://newsletter.theresanaiforthat.com/p/2-major-ai-coding-tools-go-rogue
+  Anthropic 推出了新的 AI 驱动审计代理，旨在自动检测 AI 模型何时出现异常行为，更快更好地发现有害行为
+
+- **Microsoft 365 pauses Copilot creep after admins cry foul - theregister.com** (Changelog)
+  https://www.theregister.com/2026/03/18/automatic_deployment_copilot/
+  Microsoft 已暂停强制向用户推送 Microsoft 365 Copilot 应用的计划，暂停自动安装，期限未定。"该应用为访问 Microsoft 365 中的 Copilot 体验和 AI 驱动功能提供了集中入口，"Microsoft 表示。此前可以
+
+- **Watch the newest commercials from Ikea, Chase, Dove and more - Ad Age** (Changelog)
+  https://adage.com/media/tv-streaming/aa-hot-spots-ikea-kitchen-rhythm-chase-beach-parents-dove-men-fifa-world-cup/
+  获取更智能洞察的捷径。# 观看 Ikea、Chase、Dove 等品牌的最新广告。2026 年 3 月 18 日 美国东部时间上午 11:45。## 精选故事。走进 Accenture Song，广告行业 200 亿美元的谜团。Ad Age 揭开 Accenture Song 的帷幕。酒精运动饮料崛起背后
+
+- **I Tested GitHub Copilot, Cursor, and Claude Code for 30 Days. Only ...** (Changelog)
+  https://medium.com/lets-code-future/i-tested-github-copilot-cursor-and-claude-code-for-30-days-only-one-saved-time-f7a8abfb1ec2
+  接受所有更改。首次尝试成功。Claude Code：问题：不在我的工作流中。必须切换到终端，解释上下文，复制代码回来
+
+- **GitHub Copilot vs Cursor : AI Code Editor Review for 2026** (Changelog)
+  https://www.digitalocean.com/resources/articles/github-copilot-vs-cursor
+  # GitHub Copilot vs Cursor：2026 年 AI 代码编辑器评测。GitHub Copilot 是一款 AI 编程助手，直接集成到你的开发环境中，帮助你更高效地编写代码...
+
+- **Copilot v2 API, Claude, Cursor and Gemini and LLM-Attributed Work** (Changelog)
+  https://www.gitclear.com/blog/updates_for_ai_code_era_copilot_v2_api_claude_cursor_and_gemini_and_llm_attributed_work
+  ## 标志性功能。* Snap Changelogs：AI 驱动的可视化变更快照。## 开发者体验。* 开发者使用 GitClear 的 7 大好处。 * 健康开发团队的 30 个目标。 * 技术债务：衡量和修复...
+
+- **copilot-sdk/CHANGELOG.md at main - GitHub** (Changelog)
+  https://github.com/github/copilot-sdk/blob/main/CHANGELOG.md
+  Copilot SDK 的所有重要变更都记录在此文件中。此 changelog 由 AI 代理在发布稳定版本时自动生成。
 
 ---
 
@@ -218,7 +251,13 @@ tags: [ai-coding, daily-digest]
 
 ### Hacker News
 
-(今日 HN 无 AI 编程相关热帖)
+- **Google 工程师推出 "Sashiko"，用于 Linux 内核的 Agentic AI 代码审查** (89 分, 43 条评论)
+  https://www.phoronix.com/news/Sashiko-Linux-AI-Code-Review
+  HN 讨论: https://news.ycombinator.com/item?id=47427647
+
+- **AI 编程是赌博** (309 分, 379 条评论)
+  https://notes.visaint.space/ai-coding-is-gambling/
+  HN 讨论: https://news.ycombinator.com/item?id=47428541
 
 ### Reddit
 
