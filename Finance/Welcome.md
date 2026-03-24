@@ -26,6 +26,7 @@ tags:
 - `Portfolio/` - 投资组合
 - `Analysis/` - 技术分析
 - `Reports/` - 投资报告
+- `Projects/` - 投资项目规划
 - `Templates/` - 笔记模板
 - `Attachments/` - 图表附件
 
